@@ -4,12 +4,15 @@ import {
     getElement
 } from "/modules/utils.js";
 
-function translateText(content) {
+async function translateText(content, target) {
 
+    await testsleep(1000);
     //TODO: Do real translation
-    return "Übersetzung durch Dummy: " + content + " Ende Übersetzung";
+    target.innerHTML = "Übersetzung durch Dummy: " + content + " Ende Übersetzung";
+    return target.innerHTML;
 
 }
+
 
 // Minimal number of window heights worth of entries loaded ahead of the
 // current scrolling position at any given time.
@@ -1045,7 +1048,7 @@ function EntryView(aFeedView, aEntryData) {
     titleElem.innerHTML = this.revision.title || aEntryData.entryURL;
     titleElem.setAttribute('dir', this.textDirection);
 
-    titleElemTr.innerHTML = translateText(this.revision.title || aEntryData.entryURL);
+    translateText(this.revision.title || aEntryData.entryURL, titleElemTr );
     titleElemTr.setAttribute('dir', this.textDirection);
 
     this._getElement('feed-name').innerHTML = feed.title;
@@ -1075,7 +1078,7 @@ function EntryView(aFeedView, aEntryData) {
 
         //for the translated headline
         let headlineTitleTr = this._getElement('headline-title-tr');
-        headlineTitleTr.innerHTML = translateText(this.revision.title || aEntryData.entryURL);
+        translateText(this.revision.title || aEntryData.entryURL, headlineTitleTr );
         headlineTitleTr.setAttribute('title', this.revision.title);
         headlineTitleTr.setAttribute('dir', this.textDirection);
 
@@ -1089,7 +1092,7 @@ function EntryView(aFeedView, aEntryData) {
         wait().then(() => {
             this._getElement('content').innerHTML = this.revision.content || "";
             //to translate the content I do not exactly know what it does
-            this._getElement('contetn-tr').innerHTML = translateText(this.revision.content);
+            translateText(this.revision.content,this._getElement('content-tr'));
 
             if (this.feedView.query.searchString)
                 this._highlightSearchTerms(this._getElement('headline-title'));
@@ -1101,8 +1104,8 @@ function EntryView(aFeedView, aEntryData) {
         contentElement.setAttribute('dir', this.textDirection);
 
 
-        let contentElementTr = this._getElement('content-tr');
-        contentElementTr.innerHTML = translateText(this.revision.content || "");
+        let contentElementTr = this._getElement('content-tr');		
+        translateText(this.revision.content || "", contentElementTr );
         contentElementTr.setAttribute('dir', this.textDirection);
 
         if (this.feedView.query.searchString) {
