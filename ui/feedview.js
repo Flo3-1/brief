@@ -6,9 +6,19 @@ import {
 
 async function translateText(content, target) {
 
-    await testsleep(1000);
+    //await testsleep(1000);
     //TODO: Do real translation
-    target.innerHTML = "Übersetzung durch Dummy: " + content + " Ende Übersetzung";
+    let res = await fetch('https://script.google.com/macros/s/AKfycbzb4hfCy02QFWfRR7b7TJhGcF6SeIoWRSP9hOUvMdFASVsp9Cy86ysvJhp-PQCWO4fsaQ/exec?param=' + content).then(response => {
+        return response.blob();
+
+    }).then(response => {
+
+        return response.text();
+
+    });
+
+    console.log(res);
+    target.innerHTML = res;
     return target.innerHTML;
 
 }
