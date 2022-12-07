@@ -112,6 +112,20 @@ body:not(.multiple-feeds) .headline-feed-name {
     color: #475059;
 }
 
+.headline-title-tr {
+    flex: 1 1 auto;
+    height: 18px;
+    margin-left: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: Arial, sans-serif;
+    font-weight: bold;
+    font-size: 13px;
+    line-height: 20px;
+    color: #475059;
+}
+
 article.read .headline-title {
     font-weight: normal;
     color: #5c6773;

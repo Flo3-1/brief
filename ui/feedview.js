@@ -1062,6 +1062,12 @@ function EntryView(aFeedView, aEntryData) {
         headlineTitle.setAttribute('title', this.revision.title);
         headlineTitle.setAttribute('dir', this.textDirection);
 
+        //for the translated headline
+        let headlineTitleTr = this._getElement('headline-title-tr');
+        headlineTitleTr.innerHTML = ("Übersetz:" + this.revision.title )|| aEntryData.entryURL;
+        headlineTitleTr.setAttribute('title', this.revision.title);
+        headlineTitleTr.setAttribute('dir', this.textDirection);
+
         this._getElement('headline-feed-name').textContent = feed.title;
 
         let favicon = (feed.favicon && feed.favicon != 'no-favicon')
@@ -1071,7 +1077,9 @@ function EntryView(aFeedView, aEntryData) {
 
         wait().then(() => {
             this._getElement('content').innerHTML = this.revision.content || "";
-
+            //to translate the content
+            this._getElement('contetn-tr').innerHTML = "Dies ist eine übersetzung und original content "+ this.revision.content;
+            
             if (this.feedView.query.searchString)
                 this._highlightSearchTerms(this._getElement('headline-title'));
         });
