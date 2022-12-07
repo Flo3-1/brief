@@ -11,6 +11,11 @@ article.full {
     min-width: 300px;
 }
 
+.content-container {
+    display: flex;
+    flex-direction: row;
+}
+
 .full-container {
     display: flex;
     flex: 0 1 700px;
