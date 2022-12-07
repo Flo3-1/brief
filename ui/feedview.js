@@ -1077,7 +1077,7 @@ function EntryView(aFeedView, aEntryData) {
 
         wait().then(() => {
             this._getElement('content').innerHTML = this.revision.content || "";
-            //to translate the content
+            //to translate the content I do not exactly know what it does
             this._getElement('contetn-tr').innerHTML = "Dies ist eine übersetzung und original content "+ this.revision.content;
             
             if (this.feedView.query.searchString)
@@ -1088,7 +1088,12 @@ function EntryView(aFeedView, aEntryData) {
         let contentElement = this._getElement('content');
         contentElement.innerHTML = this.revision.content || "";
         contentElement.setAttribute('dir', this.textDirection);
+        
 
+        let contentElementTr = this._getElement('content-tr');
+        contentElementTr.innerHTML =("Übersetzter text: "+ this.revision.content )|| "";
+        contentElementTr.setAttribute('dir', this.textDirection);
+        
         if (this.feedView.query.searchString) {
             wait().then(() => {
                 for (let elem of ['authors', 'tags', 'title', 'content'])

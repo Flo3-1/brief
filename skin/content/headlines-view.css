@@ -130,6 +130,10 @@ article.read .headline-title {
     font-weight: normal;
     color: #5c6773;
 }
+article.read .headline-title-tr {
+    font-weight: normal;
+    color: #5c6773;
+}
 
 
 .headline-link {
