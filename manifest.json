@@ -2,7 +2,7 @@
     "name": "Brief",
     "version": "2",
     "author": "Denis Lisov",
-    "homepage_url": "https://github.com/Flo3-1/brief",
+    "homepage_url": "https://github.com/Flo3-1/brief/tree/Chrome",
     "manifest_version": 3,
     "default_locale": "en",
 	"permissions": ["bookmarks","contextMenus",
