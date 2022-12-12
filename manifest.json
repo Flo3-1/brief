@@ -2,7 +2,7 @@
     "name": "Brief",
     "version": "2",
     "author": "Denis Lisov",
-    "homepage_url": "https://github.com/Flo3-1/brief/tree/Chrome",
+    "homepage_url": "https://github.com/Flo3-1/brief",
     "manifest_version": 3,
     "default_locale": "en",
 	"permissions": ["bookmarks","contextMenus",
@@ -16,7 +16,7 @@
     "action": {
         "default_title": "Brief",
 		"browser_style": true,
-        "default_icon": "icons/brief.svg",
+        "default_icon": "icons/brief-icon-64.png",
         "default_popup": "/ui/subscribe/subscribe.xhtml"
     },
     "commands": {
@@ -27,7 +27,7 @@
         }
     },
     "options_ui": {
-        "page": "/ui/options/options.xhtml",
-        "browser_style": true
+        "page": "/ui/options/options.html",
+        "open_in_tab": true
     }
 }
