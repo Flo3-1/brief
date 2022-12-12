@@ -1,36 +1,23 @@
 {
     "name": "Brief",
-    "version": "2.7.0a0-git",
+    "version": "2",
     "author": "Denis Lisov",
-    "homepage_url": "http://brief.mozdev.org",
-    "manifest_version": 2,
-    "applications": {
-        "gecko": {
-            "id": "brief@mozdev.org",
-            "strict_min_version": "60.0"
-        }
-    },
+    "homepage_url": "https://github.com/Flo3-1/brief/tree/Chrome",
+    "manifest_version": 3,
     "default_locale": "en",
-    "permissions": ["<all_urls>", "menus", "bookmarks",
+	"permissions": ["bookmarks","contextMenus",
         "storage", "unlimitedStorage", "downloads", "tabs", "notifications",
-        "webRequest", "webRequestBlocking"],
+        "webRequest", "declarativeNetRequest"],
+	"host_permissions": ["<all_urls>"],
     "background": {
-        "page": "background.xhtml"
+        "service_worker": "background.js",
+		"type": "module"
     },
-    "browser_action": {
-        "browser_style": true,
-        "default_icon": {
-            "16": "icons/brief-icon-16.png",
-            "32": "icons/brief-icon-32.png",
-            "64": "icons/brief-icon-64.png"
-        },
-        "default_title": "Brief"
-    },
-    "page_action": {
+    "action": {
+        "default_title": "Brief",
+		"browser_style": true,
         "default_icon": "icons/brief.svg",
-        "default_title": "Subscribe",
-        "default_popup": "/ui/subscribe/subscribe.xhtml",
-        "browser_style": true
+        "default_popup": "/ui/subscribe/subscribe.xhtml"
     },
     "commands": {
         "_execute_browser_action": {
