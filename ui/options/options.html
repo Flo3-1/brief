@@ -1,31 +1,33 @@
-<?xml version="1.0"?>
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 <head>
-    <title data-i18n="optionsWindow_title"/>
+    <title data-i18n="optionsWindow_title">
+	</title>
 
-    <link rel="stylesheet" type="text/css" href="/skin/options.css"/>
+    <link rel="stylesheet" type="text/css" href="/skin/options.css">
+	</link>
 
-    <script type="module" src="options.js"/>
+    <script type="module" src="options.js">
+	</script>
 </head>
 <body>
     <div>
-        <h2 data-i18n="refreshGroup_caption"/>
+        <h2 data-i18n="refreshGroup_caption"></h2>
         <hbox class="line">
             <label data-i18n="checkForUpdatesBefore_label"
                    data-i18n-attrs="accesskey:checkForUpdates_accesskey">
-                <input id="checkForUpdates" type="checkbox" data-pref="update.enableAutoUpdate"/>
+                <input id="checkForUpdates" type="checkbox" data-pref="update.enableAutoUpdate"></input>
             </label>
             <input type="number" min="1" id="updateInterval"
                    data-pref="update.interval"
                    data-pref-scale="60"
-                   data-requires="checkForUpdates"/>
+                   data-requires="checkForUpdates"></input>
             <select id="update-time-menulist"
                     data-requires="checkForUpdates">
-                <option data-i18n="updateIntervalMinutes_label"/>
-                <option data-i18n="updateIntervalHours_label"/>
-                <option data-i18n="updateIntervalDays_label"/>
+                <option data-i18n="updateIntervalMinutes_label"></option>
+                <option data-i18n="updateIntervalHours_label"></option>
+                <option data-i18n="updateIntervalDays_label"></option>
             </select>
         </hbox>
         <label data-i18n="showNotification_label"
@@ -34,62 +36,62 @@
         </label>
     </div>
     <div align="stretch">
-        <h2 data-i18n="readingGroup_caption"/>
+        <h2 data-i18n="readingGroup_caption"></h2>
         <label data-i18n="showUnreadCounter_label"
                data-i18n-attrs="accesskey:showUnreadCounter_accesskey">
-            <input type="checkbox" data-pref="showUnreadCounter"/>
+            <input type="checkbox" data-pref="showUnreadCounter"></input>
         </label>
         <label data-i18n="autoMarkRead_label"
                data-i18n-attrs="accesskey:autoMarkRead_accesskey">
-            <input type="checkbox" data-pref="feedview.autoMarkRead"/>
+            <input type="checkbox" data-pref="feedview.autoMarkRead"></input>
         </label>
         <label data-i18n="sortUnreadViewOldestFirst_label"
                data-i18n-attrs="accesskey:sortUnreadViewOldestFirst_accesskey">
-            <input type="checkbox" data-pref="feedview.sortUnreadViewOldestFirst"/>
+            <input type="checkbox" data-pref="feedview.sortUnreadViewOldestFirst"></input>
         </label>
     </div>
 
     <div>
-        <h2 data-i18n="storingGroup_caption"/>
+        <h2 data-i18n="storingGroup_caption"></h2>
         <hbox class="line">
             <label data-i18n="expirationBefore_label"
                    data-i18n-attrs="accesskey:expirationCheckbox_accesskey
                                     title:starredItemsKept_tooltip">
-                <input id="expirationCheckbox" type="checkbox" data-pref="database.expireEntries"/>
+                <input id="expirationCheckbox" type="checkbox" data-pref="database.expireEntries"></input>
             </label>
             <input type="number" min="1" id="expirationInterval"
                    data-pref="database.entryExpirationAge"
-                   data-requires="expirationCheckbox"/>
-            <label data-i18n="expirationAfter_label"/>
+                   data-requires="expirationCheckbox"></input>
+            <label data-i18n="expirationAfter_label"></label>
         </hbox>
         <hbox class="line">
             <label data-i18n="storedEntriesBefore_label"
                    data-i18n-attrs="accesskey:storedEntriesCheckbox_accesskey
                                     title:starredItemsKept_tooltip">
                 <input id="countLimitCheckbox" type="checkbox"
-                       data-pref="database.limitStoredEntries"/>
+                       data-pref="database.limitStoredEntries"></input>
             </label>
             <input type="number" min="1" id="maxStoredEntries"
                    data-pref="database.maxStoredEntries"
-                   data-requires="countLimitCheckbox"/>
-            <label data-i18n="storedEntriesAfter_label"/>
+                   data-requires="countLimitCheckbox"></input>
+            <label data-i18n="storedEntriesAfter_label"></label>
         </hbox>
         <hbox class="line spaced">
             <label data-i18n="confirmClearAllEntriesCheckbox">
                 <input type="checkbox"
-                       data-pref="database.keepStarredWhenClearing"/>
+                       data-pref="database.keepStarredWhenClearing"></input>
             </label>
             <button id="clear-all-entries"
                     data-i18n="clearAllEntriesButton_label"
-                    data-i18n-attrs="accesskey:clearAllEntriesButton_accesskey"/>
+                    data-i18n-attrs="accesskey:clearAllEntriesButton_accesskey"></button>
         </hbox>
     </div>
     <div>
-        <h2 data-i18n="editStyleDescription_label"/>
-        <textarea id="custom-style-textbox"/>
+        <h2 data-i18n="editStyleDescription_label"></h2>
+        <textarea id="custom-style-textbox"></textarea>
         <a id="learn-more-link"
            data-i18n="seeCustomizationTips_label"
-           data-i18n-attrs="href:seeCustomizationTips_url"/>
+           data-i18n-attrs="href:seeCustomizationTips_url"></a>
     </div>
 </body>
 
