@@ -1,4 +1,4 @@
-import {Comm} from "/modules/utils.js";
+import { Comm } from "/modules/utils.js";
 
 // Preferences are simple string-keyed values.
 //
@@ -18,89 +18,95 @@ export let Prefs = {
     _defaultEquivalent: {},
 
     async init() {
-        if(this.ready()) {
+        if (this.ready()) {
             return;
+        }
+        if (typeof browser === "undefined") {
+            var browser = chrome;
         }
         browser.storage.onChanged.addListener((changes, area) => {
             let pref_changes = changes.prefs;
-            if(area !== 'local' || pref_changes === undefined)
+            if (area !== 'local' || pref_changes === undefined)
                 return;
             this._merge(pref_changes.newValue);
         });
         Comm.registerObservers({
-            'set-pref': ({name, value, actionName}) => this.set(name, value, actionName),
+            'set-pref': ({ name, value, actionName }) => this.set(name, value, actionName),
         });
 
-        let {prefs} = await browser.storage.local.get({prefs: {}});
+        let { prefs } = await browser.storage.local.get({ prefs: {} });
         this._values = prefs;
         await this._migrateOffDefaults();
     },
 
-    ready: function() {
+    ready: function () {
         return this._values !== null;
     },
 
-    get: function(name) {
-        if(!this.ready()) {
+    get: function (name) {
+        if (!this.ready()) {
             throw new Error(`pref "${name} accessed before Prefs initialization"`);
         }
         let value = this._values[name];
-        if(value === undefined) {
+        if (value === undefined) {
             value = this._defaults[name];
         }
         return value;
     },
 
-    set: async function(name, value, actionName='update') {
-        if(!Comm.master) {
-            return Comm.callMaster('set-pref', {name, value, actionName});
+    set: async function (name, value, actionName = 'update') {
+        if (!Comm.master) {
+            return Comm.callMaster('set-pref', { name, value, actionName });
         }
-        if(this._defaults[name] === undefined) {
+        if (this._defaults[name] === undefined) {
             throw new Error(`Brief: pref ${name} does not exist`);
         }
         console.log(`Brief: ${actionName} pref ${name} to ${value}`);
         this._values[name] = value;
-        await browser.storage.local.set({prefs: this._values});
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
+        await browser.storage.local.set({ prefs: this._values });
     },
 
-    reset: async function(name) {
+    reset: async function (name) {
         await this.set(name, undefined, 'reset');
     },
 
-    addObserver: function(name, observer) {
-        this._observers.add({name, observer});
+    addObserver: function (name, observer) {
+        this._observers.add({ name, observer });
     },
 
-    removeObserver: function(name, observer) {
-        this._observers.delete({name, observer});
+    removeObserver: function (name, observer) {
+        this._observers.delete({ name, observer });
     },
 
-    _merge: function(prefs) {
-        for(let [k, v] of Object.entries(prefs)) {
+    _merge: function (prefs) {
+        for (let [k, v] of Object.entries(prefs)) {
             let oldValue = this.get(k);
-            if(v === undefined) {
+            if (v === undefined) {
                 v = this._defaults[k];
             }
-            if(oldValue === v) {
+            if (oldValue === v) {
                 continue;
             }
             this._values[k] = v;
 
             // Notify observers
-            for(let {name, observer} of this._observers) {
-                if(k.startsWith(name))
-                    observer({name: k, value: v});
+            for (let { name, observer } of this._observers) {
+                if (k.startsWith(name))
+                    observer({ name: k, value: v });
             }
         }
     },
 
     // Brief 2.5.* used to have all defaults copied to _values, so all values looked user-set
-    _migrateOffDefaults: async function() {
-        if(this.get("_pref.split-defaults") === true) {
+    _migrateOffDefaults: async function () {
+        if (this.get("_pref.split-defaults") === true) {
             return;
         }
-        for(let [k, v] of Object.entries(this._values)) {
-            if(v === this._defaultEquivalent[k]) {
+        for (let [k, v] of Object.entries(this._values)) {
+            if (v === this._defaultEquivalent[k]) {
                 delete this._values[k];
             }
         }
@@ -110,9 +116,9 @@ export let Prefs = {
 
 function pref(name, value, extra) {
     Prefs._defaults[name] = value;
-    if(extra !== undefined) {
-        let {defaultEquivalent} = extra;
-        if(defaultEquivalent !== undefined) {
+    if (extra !== undefined) {
+        let { defaultEquivalent } = extra;
+        if (defaultEquivalent !== undefined) {
             Prefs._defaultEquivalent[name] = defaultEquivalent;
         }
     }
@@ -121,7 +127,7 @@ function pref(name, value, extra) {
 // Do not use, upgrade to explicit when the value needs to change
 // Exists to avoid duplication of defaults for the pre-split prefs
 function old_pref(name, value) {
-    pref(name, value, {defaultEquivalent: value});
+    pref(name, value, { defaultEquivalent: value });
 }
 
 // The actual old_prefs and new prefs
@@ -141,8 +147,8 @@ old_pref("update.interval", 3600);
 old_pref("update.lastUpdateTime", 0);
 old_pref("update.enableAutoUpdate", true);
 old_pref("update.showNotification", true);
-pref("update.defaultFetchDelay", 500, {defaultEquivalent: 2000});
-pref("update.backgroundFetchDelay", 1000, {defaultEquivalent: 4000});
+pref("update.defaultFetchDelay", 500, { defaultEquivalent: 2000 });
+pref("update.backgroundFetchDelay", 1000, { defaultEquivalent: 4000 });
 old_pref("update.startupDelay", 35000);
 old_pref("update.suppressSecurityDialogs", true);
 old_pref("update.allowCachedResponses", false); // Testing only (avoid load on upstream servers)
