@@ -1,8 +1,27 @@
-import {Prefs} from "/modules/prefs.js";
+import { Prefs } from "/modules/prefs.js";
 import {
     Comm, expectedEvent, wait, openBackgroundTab, iterSnapshot, getPluralForm, RelativeDate,
     getElement
 } from "/modules/utils.js";
+
+async function translateText(content, target) {
+
+    //await testsleep(1000);
+    //TODO: Do real translation
+    let res = await fetch('https://script.google.com/macros/s/AKfycbzb4hfCy02QFWfRR7b7TJhGcF6SeIoWRSP9hOUvMdFASVsp9Cy86ysvJhp-PQCWO4fsaQ/exec?param=' + escape(content)).then(response => {
+        return response.blob();
+
+    }).then(response => {
+
+        return response.text();
+
+    });
+
+    console.log(res);
+    target.innerHTML = res;
+    return target.innerHTML;
+
+}
 
 
 // Minimal number of window heights worth of entries loaded ahead of the
@@ -31,7 +50,7 @@ const TUTORIAL_URL = "/ui/firstrun.xhtml?tutorial";
  * @param {{title, filter?, mode, query?, entries?, db?, feeds?}} arg
  */
 export function FeedView({
-    title, filter='all', mode='full', query={}, entries=null, db=null, feeds=null,
+    title, filter = 'all', mode = 'full', query = {}, entries = null, db = null, feeds = null,
 }) {
     this.title = title;
     this.db = db;
@@ -43,9 +62,9 @@ export function FeedView({
     // Autoselect timeout ID for clearTimeout
     this._scrollSelectionTimeout = null;
 
-    if(db !== null) {
+    if (db !== null) {
         this._feeds = db.feeds;
-    } else if(feeds !== null) {
+    } else if (feeds !== null) {
         this._feeds = feeds;
         this.document.body.classList.add("preview");
     } else {
@@ -63,9 +82,9 @@ export function FeedView({
     this.document.dispatchEvent(new Event('detach-feedview'));
 
     let button = getElement('view-title-button');
-    if(this.query.feeds && this.query.feeds.length == 1) {
+    if (this.query.feeds && this.query.feeds.length == 1) {
         button.dataset.dropdown = 'dropdown-menu-feed-actions';
-    } else if(this.query.deleted === 'trashed') {
+    } else if (this.query.deleted === 'trashed') {
         button.dataset.dropdown = 'dropdown-menu-trash-actions';
     } else {
         button.dataset.dropdown = "";
@@ -80,12 +99,12 @@ export function FeedView({
 
     this._observer = Comm.registerObservers({
         'entries-updated': info => this._applyUpdates(info),
-        'feedlist-updated': ({feeds}) => {
+        'feedlist-updated': ({ feeds }) => {
             this._setEmptyViewMessage();
-            if(this.db !== null) {
+            if (this.db !== null) {
                 let headlines = this.headlinesMode;
                 this._feeds = feeds;
-                if(headlines !== this.headlinesMode) {
+                if (headlines !== this.headlinesMode) {
                     this.refresh();
                 }
             }
@@ -99,7 +118,7 @@ export function FeedView({
     this.document.addEventListener('detach-feedview', this);
 
     // Fixed entry list if not using a query
-    if(entries !== null) {
+    if (entries !== null) {
         this._fixedEntries = entries;
     } else {
         this._fixedEntries = null;
@@ -170,11 +189,11 @@ FeedView.prototype = {
     get feedContent() { return this.document.getElementById('feed-content'); },
 
 
-    getEntryIndex: function(aEntry) { return this._loadedEntries.indexOf(aEntry); },
+    getEntryIndex: function (aEntry) { return this._loadedEntries.indexOf(aEntry); },
 
-    getEntryView:  function(aEntry) { return this._entryViews.get(aEntry); },
+    getEntryView: function (aEntry) { return this._entryViews.get(aEntry); },
 
-    isEntryLoaded: function(aEntry) { return this.getEntryIndex(aEntry) !== -1; },
+    isEntryLoaded: function (aEntry) { return this.getEntryIndex(aEntry) !== -1; },
 
     get lastLoadedEntry() { return this._loadedEntries[this._loadedEntries.length - 1]; },
 
@@ -196,7 +215,7 @@ FeedView.prototype = {
     setFilter(filter) {
         let oldFilter = this._filter;
         this._filter = filter;
-        if(filter !== oldFilter) {
+        if (filter !== oldFilter) {
             this.refresh();
         }
     },
@@ -204,7 +223,7 @@ FeedView.prototype = {
     setDefaultViewMode(mode) {
         let prev = this.headlinesMode;
         this._defaultViewMode = mode;
-        if(this.headlinesMode !== prev) {
+        if (this.headlinesMode !== prev) {
             this.refresh();
         }
     },
@@ -215,7 +234,7 @@ FeedView.prototype = {
 
     getFeed(feedID) {
         let feed = this.feeds.find(f => f.feedID === feedID);
-        if(feed === undefined) {
+        if (feed === undefined) {
             return undefined;
         }
         return Object.assign({}, feed);
@@ -328,18 +347,18 @@ FeedView.prototype = {
     /**
      * Keep the selected item iff the last scroll was towards it and it's visible.
      */
-    clampSelection: function FeedView_clampSelection({lastDelta}) {
+    clampSelection: function FeedView_clampSelection({ lastDelta }) {
         let dir = Math.sign(lastDelta);
 
         let current = this.getEntryView(this.selectedEntry);
-        if(current) {
+        if (current) {
             let start = current.offsetTop + ((dir < 0) ? current.height : 0);
             let end = current.offsetTop + ((dir < 0) ? 0 : current.height);
 
             let center = this.window.pageYOffset + this.window.innerHeight / 2;
             let forward_end = this.window.pageYOffset + ((dir < 0) ? 0 : this.window.innerHeight);
 
-            if((end - center) * dir > 0 && (forward_end - start) * dir > 0)
+            if ((end - center) * dir > 0 && (forward_end - start) * dir > 0)
                 return;
         }
 
@@ -367,7 +386,7 @@ FeedView.prototype = {
 
     _autoMarkRead: function FeedView__autoMarkRead() {
         if (Prefs.get('feedview.autoMarkRead')
-                && !this.headlinesMode && this.query.read !== false) {
+            && !this.headlinesMode && this.query.read !== false) {
             clearTimeout(this._markVisibleTimeout);
             let callback = this._callbackRefreshGuard(this.markVisibleEntriesRead.bind(this));
             this._markVisibleTimeout = setTimeout(callback, 500);
@@ -379,7 +398,7 @@ FeedView.prototype = {
     _entriesMarkedUnread: [],
 
     markVisibleEntriesRead: function FeedView_markVisibleEntriesRead() {
-        if(this.db === null) {
+        if (this.db === null) {
             return;
         }
         let winTop = this.window.pageYOffset;
@@ -432,11 +451,11 @@ FeedView.prototype = {
             // Click listener must be attached to the document, not the entry container,
             // in order to catch middle-clicks.
             case 'click':
-                if(aEvent.button !== 0) {
+                if (aEvent.button !== 0) {
                     aEvent.preventDefault();
                     return;
                 }
-                // fallthrough
+            // fallthrough
             case 'auxclick':
                 {
                     // The tutorial link needs to be opened from a privileged context
@@ -469,7 +488,7 @@ FeedView.prototype = {
 
                     let position = this.window.pageYOffset;
                     let prevPosition = this._prevPosition;
-                    if(position === prevPosition)
+                    if (position === prevPosition)
                         return;
 
                     getElement('feed-view-header').classList.toggle(
@@ -477,7 +496,7 @@ FeedView.prototype = {
 
                     clearTimeout(this._scrollSelectionTimeout);
                     let callback = this._callbackRefreshGuard(() =>
-                        this.clampSelection({lastDelta: position - prevPosition})
+                        this.clampSelection({ lastDelta: position - prevPosition })
                     );
                     this._scrollSelectionTimeout = setTimeout(callback, 50);
 
@@ -507,32 +526,32 @@ FeedView.prototype = {
         }
     },
 
-    _applyUpdates({entries, changes}) {
+    _applyUpdates({ entries, changes }) {
         // No updates shall be followed in no-database mode
-        if(this.db === null) {
+        if (this.db === null) {
             return;
         }
-        if(document.hidden) {
+        if (document.hidden) {
             this._refreshPending = true;
             return;
         }
         let entryList = entries.map(entry => entry.id);
-        if(changes.content === true) {
+        if (changes.content === true) {
             this._onEntriesRemoved(entryList, false, false);
             this._onEntriesAdded(entryList)
                 .catch(this._ignoreRefresh);
             return;
         }
-        if(changes.deleted !== undefined) {
+        if (changes.deleted !== undefined) {
             if (changes.deleted === this.query.deleted) {
                 this._onEntriesAdded(entryList)
                     .catch(this._ignoreRefresh);
             } else {
                 this._onEntriesRemoved(entryList, true, true);
             }
-        } else if(changes.read !== undefined) {
+        } else if (changes.read !== undefined) {
             if (this.query.read === false) {
-                if(changes.read) {
+                if (changes.read) {
                     this._onEntriesRemoved(entryList, true, true);
                 } else {
                     this._onEntriesAdded(entryList)
@@ -540,15 +559,15 @@ FeedView.prototype = {
                 }
             }
 
-            for(let entry of entryList.filter(id => this._loadedEntries.includes(id))) {
+            for (let entry of entryList.filter(id => this._loadedEntries.includes(id))) {
                 this.getEntryView(entry).read = changes.read;
 
                 if (Prefs.get('feedview.autoMarkRead') && !changes.read)
                     this._entriesMarkedUnread.push(entry);
             }
-        } else if(changes.starred !== undefined) {
+        } else if (changes.starred !== undefined) {
             if (this.query.starred === true) {
-                if(changes.starred) {
+                if (changes.starred) {
                     this._onEntriesAdded(entryList)
                         .catch(this._ignoreRefresh);
                 } else {
@@ -556,7 +575,7 @@ FeedView.prototype = {
                 }
             }
 
-            for(let entry of entryList.filter(id => this._loadedEntries.includes(id))) {
+            for (let entry of entryList.filter(id => this._loadedEntries.includes(id))) {
                 this.getEntryView(entry).starred = changes.starred;
             }
         }
@@ -570,7 +589,7 @@ FeedView.prototype = {
      *        Array of IDs of entries.
      */
     _onEntriesAdded: async function FeedView__onEntriesAdded(aAddedEntries) {
-        if(this.db === null) {
+        if (this.db === null) {
             return;
         }
         // The simplest way would be to query the current list of all entries in the view
@@ -618,7 +637,7 @@ FeedView.prototype = {
         else {
             if (this._allEntriesLoaded) {
                 let entryList = await this.db.query(this.query).getIds();
-                if(aAddedEntries.some(id => entryList.includes(id)))
+                if (aAddedEntries.some(id => entryList.includes(id)))
                     this.refresh();
             }
             else {
@@ -637,8 +656,8 @@ FeedView.prototype = {
      * @param aLoadNewEntries
      *        Load new entries to fill the screen.
      */
-    _onEntriesRemoved: function(aRemovedEntries, aAnimate, aLoadNewEntries) {
-        if(this.db === null) {
+    _onEntriesRemoved: function (aRemovedEntries, aAnimate, aLoadNewEntries) {
+        if (this.db === null) {
             return;
         }
         let containedEntries = aRemovedEntries.filter(this.isEntryLoaded, this);
@@ -681,7 +700,7 @@ FeedView.prototype = {
 
                 // They day header may have been already removed by another callback.
                 let nextSibling = /** @type HTMLElement? */(dayHeader.nextSibling);
-                if (dayHeader && (! nextSibling || nextSibling.tagName == 'H1'))
+                if (dayHeader && (!nextSibling || nextSibling.tagName == 'H1'))
                     this.feedContent.removeChild(dayHeader);
 
                 if (++removedCount == indices.length) {
@@ -719,7 +738,7 @@ FeedView.prototype = {
         this.document.body.classList.remove('multiple-feeds');
 
         // Manually reset the scroll position, otherwise weird stuff happens.
-        this.window.scrollTo({top: 0});
+        this.window.scrollTo({ top: 0 });
         this._prevPosition = 0;
 
         // Clear DOM content.
@@ -783,10 +802,10 @@ FeedView.prototype = {
                 : LOAD_STEP_SIZE;
             do {
                 let loaded = await this._refreshGuard(this._loadEntries(stepSize));
-                if(!loaded) {
+                if (!loaded) {
                     break;
                 }
-            } while(this.shouldLoadMore(aWindowHeights));
+            } while (this.shouldLoadMore(aWindowHeights));
         }
     },
 
@@ -798,9 +817,9 @@ FeedView.prototype = {
      */
     enoughEntriesPreloaded: function FeedView__enoughEntriesPreloaded(aWindowHeights) {
         return this._loadedEntries.length > 0 &&
-               (this.document.body.scrollHeight - this.window.pageYOffset  >
+            (this.document.body.scrollHeight - this.window.pageYOffset >
                 this.window.innerHeight * (aWindowHeights + 1))
-               && this.getEntryInScreenCenter() != this.lastLoadedEntry;
+            && this.getEntryInScreenCenter() != this.lastLoadedEntry;
     },
 
     /**
@@ -821,7 +840,7 @@ FeedView.prototype = {
      *          of entries that were loaded.
      */
     _loadEntries: async function FeedView__loadEntries(aCount) {
-        if(this._fixedEntries !== null) {
+        if (this._fixedEntries !== null) {
             for (let entry of this._fixedEntries) {
                 this._insertEntry(entry, this._loadedEntries.length);
                 this._loadedEntries.push(entry.id);
@@ -829,7 +848,7 @@ FeedView.prototype = {
             this._allEntriesLoaded = true;
             return;
         }
-        if(this.db === null) {
+        if (this.db === null) {
             return;
         }
 
@@ -919,7 +938,7 @@ FeedView.prototype = {
         if (!this.feeds.length) {
             mainMessage = browser.i18n.getMessage('noFeeds');
             secondaryMessage = '<a href="' + TUTORIAL_URL + '" target="_blank">'
-                               + browser.i18n.getMessage('noFeedsAdvice') + '</a>';
+                + browser.i18n.getMessage('noFeedsAdvice') + '</a>';
         }
         else if (this.query.searchString) {
             mainMessage = browser.i18n.getMessage('noEntriesFound');
@@ -937,7 +956,7 @@ FeedView.prototype = {
             mainMessage = browser.i18n.getMessage('noEntries');
         }
 
-        this.document.getElementById('main-message').textContent = mainMessage || '' ;
+        this.document.getElementById('main-message').textContent = mainMessage || '';
         this.document.getElementById('secondary-message').innerHTML = secondaryMessage || '';
 
         messageBox.style.display = '';
@@ -987,7 +1006,7 @@ FeedView.prototype = {
 
 const DEFAULT_FAVICON_URL = browser.extension.getURL('/icons/default-feed-favicon.png');
 const RTL_LANGUAGE_CODES = [
-    'ar', 'arc', 'dv', 'fa', 'ha', 'he', 'khw', 'ks', 'ku', 'ps', 'syr', 'ur', 'yi' ];
+    'ar', 'arc', 'dv', 'fa', 'ha', 'he', 'khw', 'ks', 'ku', 'ps', 'syr', 'ur', 'yi'];
 
 
 function EntryView(aFeedView, aEntryData) {
@@ -1030,12 +1049,17 @@ function EntryView(aFeedView, aEntryData) {
     }
 
     let titleElem = this._getElement('title-link');
-    if (aEntryData.entryURL)
+    let titleElemTr = this._getElement('title-link-tr');
+    if (aEntryData.entryURL) {
         titleElem.setAttribute('href', aEntryData.entryURL);
-
+        titleElemTr.setAttribute('href', aEntryData.entryURL);
+    }
     // Use innerHTML instead of textContent to resolve entities.
     titleElem.innerHTML = this.revision.title || aEntryData.entryURL;
     titleElem.setAttribute('dir', this.textDirection);
+
+    translateText(this.revision.title || aEntryData.entryURL, titleElemTr );
+    titleElemTr.setAttribute('dir', this.textDirection);
 
     this._getElement('feed-name').innerHTML = feed.title;
     this._getElement('authors').innerHTML = this.revision.authors;
@@ -1064,7 +1088,7 @@ function EntryView(aFeedView, aEntryData) {
 
         //for the translated headline
         let headlineTitleTr = this._getElement('headline-title-tr');
-        headlineTitleTr.innerHTML = ("Übersetz:" + this.revision.title )|| aEntryData.entryURL;
+        translateText(this.revision.title || aEntryData.entryURL, headlineTitleTr );
         headlineTitleTr.setAttribute('title', this.revision.title);
         headlineTitleTr.setAttribute('dir', this.textDirection);
 
@@ -1077,9 +1101,9 @@ function EntryView(aFeedView, aEntryData) {
 
         wait().then(() => {
             this._getElement('content').innerHTML = this.revision.content || "";
-            //to translate the content
-            this._getElement('contetn-tr').innerHTML = "Dies ist eine übersetzung und original content "+ this.revision.content;
-            
+            //to translate the content I do not exactly know what it does
+            translateText(this.revision.content,this._getElement('content-tr'));
+
             if (this.feedView.query.searchString)
                 this._highlightSearchTerms(this._getElement('headline-title'));
         });
@@ -1088,6 +1112,11 @@ function EntryView(aFeedView, aEntryData) {
         let contentElement = this._getElement('content');
         contentElement.innerHTML = this.revision.content || "";
         contentElement.setAttribute('dir', this.textDirection);
+
+
+        let contentElementTr = this._getElement('content-tr');		
+        translateText(this.revision.content || "", contentElementTr );
+        contentElementTr.setAttribute('dir', this.textDirection);
 
         if (this.feedView.query.searchString) {
             wait().then(() => {
@@ -1243,7 +1272,7 @@ EntryView.prototype = {
             if (this.selected) {
                 let entryBottom = this.offsetTop + this.height;
                 let screenBottom = this.feedView.window.pageYOffset +
-                                   this.feedView.window.innerHeight;
+                    this.feedView.window.innerHeight;
                 if (entryBottom > screenBottom)
                     this.feedView.scrollToEntry(this.id, false, true);
             }
@@ -1262,7 +1291,7 @@ EntryView.prototype = {
 
     onClick: function EntryView_onClick(aEvent) {
         // If the item is already being removed, no action should be taken
-        if(this.container.getAttribute("removing")) {
+        if (this.container.getAttribute("removing")) {
             // Prevent the default action, without this
             // clicking on removing feeds opens them in the brief tab
             aEvent.preventDefault();
@@ -1316,7 +1345,7 @@ EntryView.prototype = {
                 break;
 
             case 'star':
-                if(this.feedView.db === null) {
+                if (this.feedView.db === null) {
                     return;
                 }
                 if (this.starred) {
@@ -1426,11 +1455,11 @@ EntryView.prototype = {
                 XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
                 null /* result to reuse */
             );
-            for(let node of iterSnapshot(nodes)) {
+            for (let node of iterSnapshot(nodes)) {
                 let substrings = node.textContent.split(term);
                 let output = [];
-                for(let substring of substrings) {
-                    if(output.length > 0) {
+                for (let substring of substrings) {
+                    if (output.length > 0) {
                         output.push(baseNode.cloneNode(true));
                     }
                     output.push(substring);
@@ -1442,19 +1471,19 @@ EntryView.prototype = {
 
     // TODO: refactor into FeedViewModel/FeedEntryModel after they're split off
     deleteEntry() {
-        if(this.feedView.db) {
+        if (this.feedView.db) {
             this.feedView.db.query(this.id).markDeleted('trashed');
         }
     },
 
     restoreEntry() {
-        if(this.feedView.db) {
+        if (this.feedView.db) {
             this.feedView.db.query(this.id).markDeleted(false);
         }
     },
 
     markEntryRead(state) {
-        if(this.feedView.db) {
+        if (this.feedView.db) {
             this.feedView.db.query(this.id).markRead(state);
         }
     },
@@ -1471,17 +1500,17 @@ EntryView.prototype = {
 
 
     formatters: {
-        time: new Intl.DateTimeFormat(navigator.language, {hour: 'numeric', minute: 'numeric'}),
+        time: new Intl.DateTimeFormat(navigator.language, { hour: 'numeric', minute: 'numeric' }),
         datetime: new Intl.DateTimeFormat(
             navigator.language,
             {
                 year: 'numeric', month: 'numeric', day: 'numeric',
                 hour: 'numeric', minute: 'numeric', second: 'numeric',
             }),
-        weekday: new Intl.DateTimeFormat(navigator.language, {weekday: 'long'}),
-        date_md: new Intl.DateTimeFormat(navigator.language, {month: 'long', day: 'numeric'}),
+        weekday: new Intl.DateTimeFormat(navigator.language, { weekday: 'long' }),
+        date_md: new Intl.DateTimeFormat(navigator.language, { month: 'long', day: 'numeric' }),
         date_ymd: new Intl.DateTimeFormat(
-            navigator.language, {year: 'numeric', month: 'long', day: 'numeric'}),
+            navigator.language, { year: 'numeric', month: 'long', day: 'numeric' }),
     },
 
 };
@@ -1528,7 +1557,7 @@ async function showElement(aElement, aAnimate) {
 const Strings = new Proxy({}, {
     /** @param {string} prop */
     get(target, prop) {
-        if(target[prop] === undefined) {
+        if (target[prop] === undefined) {
             target[prop] = browser.i18n.getMessage(prop);
         }
         return target[prop];
