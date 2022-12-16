@@ -63,23 +63,23 @@ const Brief = {
             menus = chrome.contextMenus;
         }
 
-        browser.menus.create({
+        menus.create({
             id: "brief-button-refresh",
             title: browser.i18n.getMessage("briefCtxRefreshFeeds_label"),
             contexts: ["browser_action"]
         });
-        browser.menus.create({
+        menus.create({
             id: "brief-button-mark-read",
             title: browser.i18n.getMessage("briefCtxMarkFeedsAsRead_label"),
             contexts: ["browser_action"]
         });
-        browser.menus.create({
+        menus.create({
             id: "brief-button-show-unread",
             type: "checkbox",
             title: browser.i18n.getMessage("briefCtxShowUnreadCounter_label"),
             contexts: ["browser_action"]
         });
-        browser.menus.create({
+        menus.create({
             id: "brief-button-options",
             title: browser.i18n.getMessage("briefCtxShowOptions_label"),
             contexts: ["browser_action"]

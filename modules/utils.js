@@ -146,6 +146,9 @@ export let Comm = {
 
     initMaster() {
         this.master = true;
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         browser.runtime.onMessage.addListener(message => this._notify(message));
     },
 
@@ -156,6 +159,9 @@ export let Comm = {
         switch(message._type) {
             case 'broadcast-tx':
                 message._type = 'broadcast';
+		if (typeof browser === "undefined") {
+			var browser = chrome;
+		}
                 return Promise.all([
                     this._notifyObservers(message).catch(() => undefined),
                     browser.runtime.sendMessage(message).catch(() => undefined),

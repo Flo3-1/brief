@@ -1,3 +1,4 @@
 *.xpi
 node_modules/
 package-lock.json
+*.swp
