@@ -60,6 +60,9 @@ export let Database = {
      * 2.4 to 2.5.5 used to use `persistent`).
      */
     async init() {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         if(this._db)
             return this;
 
@@ -90,7 +93,12 @@ export let Database = {
             version: this.DB_VERSION,
             upgrade,
         });
-        navigator.storage.persist();
+	await navigator.storage.estimate();
+	// !!!!!!! TODO: it works now but it might break or just not have any long time storage
+	if(typeof navigator.storage.persist ==="function"){
+		navigator.storage.persist();
+	}
+
         this._db = db;
         await this.loadFeeds();
         let entryCount = await this.countEntries();
@@ -147,16 +155,10 @@ export let Database = {
         let description = `database in ${storage} storage`;
         let canUpgrade = (upgrade !== null);
         console.log(`Brief: opening ${description}${ canUpgrade ? " with upgrade" : "" }`);
-        let openOptions = version;
-        if(storage === 'persistent') {
-            openOptions = {
-                storage: 'persistent',
-                version,
-            };
-        }
         let db;
         let upgradeFrom;
-        let opener = indexedDB.open(name, openOptions);
+	//open options are not suported for some reason
+        let opener = indexedDB.open(name);
         if(upgrade !== null) {
             opener.onupgradeneeded = (event) => upgrade(event);
         } else {
@@ -315,6 +317,9 @@ export let Database = {
     },
 
     async loadFeeds() {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         let tx = this._db.transaction(['feeds']);
         let request = tx.objectStore('feeds').getAll();
         let feeds = await DbUtil.requestPromise(request);
@@ -849,6 +854,9 @@ export let Database = {
     },
 
     async _saveFeedBackups(feeds) {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         let minimizedFeeds = [];
         for(let feed of feeds) {
             let minimized = Object.assign({}, feed);

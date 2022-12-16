@@ -33,6 +33,9 @@ export let FeedUpdater = {
     },
 
     async init({db}) {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         this.db = db;
         /*spawn*/ this._scheduler();
 
@@ -192,6 +195,9 @@ export let FeedUpdater = {
     },
 
     async _finish() {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         this.completed = [];
         console.log('Brief: update finished');
 

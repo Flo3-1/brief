@@ -143,6 +143,9 @@ const Brief = {
     },
 
     onContext: function({menuItemId, checked=null}) {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         switch(menuItemId) {
             case 'brief-button-refresh':
                 Comm.broadcast('update-all');
@@ -182,6 +185,9 @@ const Brief = {
         "(chrome://brief/content/brief\\.(xul|xhtml)\\?subscribe=|brief://subscribe/)(.*)"),
 
     async queryFeeds({windowId, tabId, url=undefined, title=undefined, status=undefined}) {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         let replies = [[]];
         let matchSubscribe = this.BRIEF_SUBSCRIBE.exec(url);
         if(matchSubscribe) {
@@ -251,9 +257,18 @@ const Brief = {
     },
 
     _updateUI: async function() {
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
+        let menus;
+        if (typeof chrome === "undefined") {
+            menus = browser.menus;
+        } else {
+            menus = chrome.contextMenus;
+        }
 
         let enabled = Prefs.get('showUnreadCounter');
-        browser.menus.update('brief-button-show-unread', {checked: enabled});
+        menus.update('brief-button-show-unread', {checked: enabled});
         if(enabled) {
             let count = await Database.query({
                 deleted: 0,
