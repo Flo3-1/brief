@@ -26,6 +26,10 @@ const Brief = {
         Comm.initMaster();
 
         // @ts-ignore Types do not know about the temporary flag
+        // to make this available in chrome
+        if (typeof browser === "undefined") {
+            var browser = chrome;
+        }
         browser.runtime.onInstalled.addListener(async ({temporary}) => {
             if(temporary) { // `web-ext run` or equivalent
                 Comm.verbose = true;
@@ -43,9 +47,21 @@ const Brief = {
             }
         });
 
+        if (typeof browser.browserAction === "undefined") {
+            browser.browserAction = browser.action;
+
+        }
+
         browser.browserAction.onClicked.addListener(
             () => browser.tabs.create({url: '/ui/brief.xhtml'}));
         browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
+
+        let menus;
+        if (typeof chrome === "undefined") {
+            menus = browser.menus;
+        } else {
+            menus = chrome.contextMenus;
+        }
 
         browser.menus.create({
             id: "brief-button-refresh",
@@ -68,15 +84,20 @@ const Brief = {
             title: browser.i18n.getMessage("briefCtxShowOptions_label"),
             contexts: ["browser_action"]
         });
-        browser.menus.onClicked.addListener(info => this.onContext(info));
 
-        let browserInfo = await browser.runtime.getBrowserInfo();
-        let baseVersion = browserInfo.version.split('.')[0];
-        if(Number(baseVersion) < 64) { // Early Firefox 64 nightlies have previews too
-            this._firefoxPreviewWorkaround = true;
-            console.log("Enabling Firefox built-in feed preview detection");
-        } else {
+        //I have no idea what this does so it has to leave
+        // TODO: find out whtat the purpose is
+        //browser.menus.onClicked.addListener(info => this.onContext(info));
+
+        if (typeof chrome.runtime.getBrowserInfo !== "undefined") {
+            let browserInfo = await browser.runtime.getBrowserInfo();
+            let baseVersion = browserInfo.version.split('.')[0];
+            if (Number(baseVersion) < 64) { // Early Firefox 64 nightlies have previews too
+                this._firefoxPreviewWorkaround = true;
+                console.log("Enabling Firefox built-in feed preview detection");
+            } else {
             /*spawn*/ RequestMonitor.init();
+            }
         }
 
         await Prefs.init();
@@ -351,4 +372,6 @@ Brief.init();
 
 // Debugging hook
 // @ts-ignore
-window.Brief = Brief;
+if (typeof window !== "undefined"){
+   	window.Brief = Brief;
+}
