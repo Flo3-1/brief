@@ -79,7 +79,7 @@ export function FeedView({
 
     this._entriesMarkedUnread = [];
 
-    this.document.dispatchEvent(new Event('detach-feedview'));
+    // this.document.dispatchEvent(new Event('detach-feedview'));
 
     let button = getElement('view-title-button');
     if (this.query.feeds && this.query.feeds.length == 1) {
@@ -182,7 +182,7 @@ FeedView.prototype = {
 
     get browser() { return /** @type HTMLIFrameElement */ (getElement('feed-view')); },
 
-    get document() { return this.browser.contentDocument; },
+    get document() { return this.contentDocument; },
 
     get window() { return this.document.defaultView; },
 
@@ -936,24 +936,24 @@ FeedView.prototype = {
         let mainMessage, secondaryMessage;
 
         if (!this.feeds.length) {
-            mainMessage = browser.i18n.getMessage('noFeeds');
+            mainMessage = chrome.i18n.getMessage('noFeeds');
             secondaryMessage = '<a href="' + TUTORIAL_URL + '" target="_blank">'
-                + browser.i18n.getMessage('noFeedsAdvice') + '</a>';
+                + chrome.i18n.getMessage('noFeedsAdvice') + '</a>';
         }
         else if (this.query.searchString) {
-            mainMessage = browser.i18n.getMessage('noEntriesFound');
+            mainMessage = chrome.i18n.getMessage('noEntriesFound');
         }
         else if (this.query.read === false) {
-            mainMessage = browser.i18n.getMessage('noUnreadEntries');
+            mainMessage = chrome.i18n.getMessage('noUnreadEntries');
         }
         else if (this.query.starred === true) {
-            mainMessage = browser.i18n.getMessage('noStarredEntries');
+            mainMessage = chrome.i18n.getMessage('noStarredEntries');
         }
         else if (this.query.deleted === 'trashed') {
-            mainMessage = browser.i18n.getMessage('trashIsEmpty');
+            mainMessage = chrome.i18n.getMessage('trashIsEmpty');
         }
         else {
-            mainMessage = browser.i18n.getMessage('noEntries');
+            mainMessage = chrome.i18n.getMessage('noEntries');
         }
 
         this.document.getElementById('main-message').textContent = mainMessage || '';
@@ -1004,7 +1004,7 @@ FeedView.prototype = {
 
 
 
-const DEFAULT_FAVICON_URL = browser.extension.getURL('/icons/default-feed-favicon.png');
+const DEFAULT_FAVICON_URL = chrome.runtime.getURL('/icons/default-feed-favicon.png');
 const RTL_LANGUAGE_CODES = [
     'ar', 'arc', 'dv', 'fa', 'ha', 'he', 'khw', 'ks', 'ku', 'ps', 'syr', 'ur', 'yi'];
 
@@ -1408,14 +1408,14 @@ EntryView.prototype = {
                 case relativeDate.deltaHours === 0: {
                     let minuteForm = getPluralForm(
                         relativeDate.deltaMinutes, Strings['minute_pluralForms']);
-                    return browser.i18n.getMessage('entryDate_ago', minuteForm)
+                    return chrome.i18n.getMessage('entryDate_ago', minuteForm)
                         .replace('#number', relativeDate.deltaMinutes.toString());
                 }
 
                 case relativeDate.deltaHours <= 12: {
                     let hourForm = getPluralForm(
                         relativeDate.deltaHours, Strings['hour_pluralForms']);
-                    return browser.i18n.getMessage('entryDate_ago', hourForm)
+                    return chrome.i18n.getMessage('entryDate_ago', hourForm)
                         .replace('#number', relativeDate.deltaHours.toString());
                 }
 
@@ -1558,7 +1558,7 @@ const Strings = new Proxy({}, {
     /** @param {string} prop */
     get(target, prop) {
         if (target[prop] === undefined) {
-            target[prop] = browser.i18n.getMessage(prop);
+            target[prop] = chrome.i18n.getMessage(prop);
         }
         return target[prop];
     }
