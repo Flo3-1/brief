@@ -56,7 +56,7 @@ function initUpdateIntervalControls() {
     scaleMenu.dispatchEvent(event);
 
     document.getElementById('clear-all-entries').addEventListener('click', async () => {
-        if (window.confirm(browser.i18n.getMessage('confirmClearAllEntriesText'))) {
+        if (window.confirm(chrome.i18n.getMessage('confirmClearAllEntriesText'))) {
             await Database.query({
                 starred: Prefs.get('database.keepStarredWhenClearing') ? 0 : undefined,
                 includeHiddenFeeds: true
@@ -77,7 +77,7 @@ let StyleEditor = {
     editor: null,
 
     async init() {
-        let {custom_css: style} = await browser.storage.local.get({'custom_css': this.EXAMPLE_CSS});
+        let {custom_css: style} = await chrome.storage.local.get({'custom_css': this.EXAMPLE_CSS});
         this.editor = document.getElementById('custom-style-textbox');
         this.editor.value = style;
 
@@ -86,7 +86,7 @@ let StyleEditor = {
 
     async save() {
         let style = this.editor.value;
-        await browser.storage.local.set({'custom_css': style});
+        await chrome.storage.local.set({'custom_css': style});
 
         Comm.broadcast('style-updated');
     },
