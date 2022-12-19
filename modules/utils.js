@@ -117,7 +117,7 @@ RelativeDate.prototype = {
 
 
 export function getPluralForm(number, forms) {
-    let knownForms = browser.i18n.getMessage('pluralRule').split(';');
+    let knownForms = chrome.i18n.getMessage('pluralRule').split(';');
     let rules = new Intl.PluralRules();
     let form = rules.select(number);
     return forms.split(';')[knownForms.indexOf(form)];
@@ -125,13 +125,13 @@ export function getPluralForm(number, forms) {
 
 
 export async function openBackgroundTab(url) {
-    let tab = await browser.tabs.getCurrent();
+    let tab = await chrome.tabs.getCurrent();
     try {
-        await browser.tabs.create({active: false, url: url, openerTabId: tab.id});
+        await chrome.tabs.create({active: false, url: url, openerTabId: tab.id});
     }
     catch(e) {
         if(e.message.includes("openerTabId")) {
-            await browser.tabs.create({active: false, url: url});
+            await chrome.tabs.create({active: false, url: url});
         } else {
             throw e;
         }
@@ -149,7 +149,7 @@ export let Comm = {
         if (typeof browser === "undefined") {
             var browser = chrome;
         }
-        browser.runtime.onMessage.addListener(message => this._notify(message));
+        chrome.runtime.onMessage.addListener(message => this._notify(message));
     },
 
     _notify(message) {
@@ -164,7 +164,7 @@ export let Comm = {
 		}
                 return Promise.all([
                     this._notifyObservers(message).catch(() => undefined),
-                    browser.runtime.sendMessage(message).catch(() => undefined),
+                    chrome.runtime.sendMessage(message).catch(() => undefined),
                 ]).then(([local, remote]) => local !== undefined ? local : remote);
             case 'master':
                 return this._notifyObservers(message);
@@ -187,7 +187,7 @@ export let Comm = {
         if(this.master) {
             return this._notify(message);
         } else {
-            return browser.runtime.sendMessage(message);
+            return chrome.runtime.sendMessage(message);
         }
     },
 
@@ -205,7 +205,7 @@ export let Comm = {
         if(Comm.master) {
             Comm.observers.add(listener);
         } else {
-            browser.runtime.onMessage.addListener(listener);
+            chrome.runtime.onMessage.addListener(listener);
         }
         return listener;
     },
@@ -214,7 +214,7 @@ export let Comm = {
         if(Comm.master) {
             Comm.observers.delete(listener);
         } else {
-            browser.runtime.onMessage.removeListener(listener);
+            chrome.runtime.onMessage.removeListener(listener);
         }
     },
 
