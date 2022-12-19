@@ -107,7 +107,7 @@ async function init() {
     } else {
         // Intentionally do not support subscribing from Private Browsing or containers
         // because doing this without correct fetch setup is a privacy leak
-        if(await browser.runtime.getBackgroundPage() === null) {
+        if(await chrome.runtime.getBackgroundPage() === null) {
             console.log("Incognito / container detected, disabling subscription");
             document.body.classList.add('incognito');
             (/** @type {HTMLButtonElement} */(document.getElementById('subscribe-button'))).disabled = true;
@@ -115,7 +115,7 @@ async function init() {
         let knownFeeds = await knownFeedsPromise;
         updatePreviewMode(knownFeeds);
         let parsedFeed = await parsedFeedPromise;
-        document.title = browser.i18n.getMessage("previewTitle", parsedFeed.title);
+        document.title = chrome.i18n.getMessage("previewTitle", parsedFeed.title);
 
         let feed = Object.assign({}, {
             feedID: "PREVIEW",
@@ -200,7 +200,7 @@ let Searchbar = {
         let searchbar = this.element();
 
         if (searchbar.value)
-            gCurrentView.titleOverride = browser.i18n.getMessage('searchResults', searchbar.value);
+            gCurrentView.titleOverride = chrome.i18n.getMessage('searchResults', searchbar.value);
         else
             gCurrentView.titleOverride = '';
 
