@@ -17,7 +17,7 @@
         "default_title": "Brief",
 		"browser_style": true,
         "default_icon": "icons/brief-icon-64.png",
-        "default_popup": "/ui/subscribe/subscribe.xhtml"
+        "default_popup": "/ui/subscribe/subscribe.html"
     },
     "commands": {
         "_execute_browser_action": {
