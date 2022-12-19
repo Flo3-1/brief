@@ -12,8 +12,8 @@ async function onload() {
     }
 
     // Workaround for mozilla bug 1408446
-    let {id, height} = await browser.windows.getCurrent();
-    await browser.windows.update(id, {height: height + 1});
+    let {id, height} = await chrome.windows.getCurrent();
+    await chrome.windows.update(id, {height: height + 1});
 }
 
 function onKeyup({key}) {
