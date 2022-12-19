@@ -962,7 +962,7 @@ export let TagListContextMenu = {
     deleteTag: async function TagListContextMenu_deleteTag() {
         let tag = TagList.selectedItem.dataset.id;
 
-        let text = browser.i18n.getMessage('confirmTagDeletionText', tag);
+        let text = chrome.i18n.getMessage('confirmTagDeletionText', tag);
 
         if (!window.confirm(text))
             return;
@@ -1047,7 +1047,7 @@ export let FeedListContextMenu = {
     deleteFolder: function FolderContextMenu_deleteFolder() {
         let feed = FeedList.selectedFeed;
 
-        let text = browser.i18n.getMessage('confirmFolderDeletionText', feed.title);
+        let text = chrome.i18n.getMessage('confirmFolderDeletionText', feed.title);
 
         if (window.confirm(text))
             FeedList.db.deleteFeed(feed);
@@ -1062,7 +1062,7 @@ export let DropdownMenus = {
             'dropdown-shortcuts': () => Commands.displayShortcuts(),
             'dropdown-import': () => opmlInput.click(),
             'dropdown-export': () => OPML.exportFeeds(),
-            'dropdown-options': () => browser.runtime.openOptionsPage(),
+            'dropdown-options': () => chrome.runtime.openOptionsPage(),
             'dropdown-update-feed': () => Comm.callMaster(
                 'update-feeds', {feeds: [FeedList.selectedFeed.feedID]}),
             'brief-open-website': () => Commands.openFeedWebsite(),
@@ -1150,7 +1150,7 @@ export let Commands = {
 
     deleteFeed: function cmd_deleteFeed(aFeed) {
         let feed = aFeed ? aFeed : FeedList.selectedFeed;
-        let text = browser.i18n.getMessage('confirmFeedDeletionText', feed.title);
+        let text = chrome.i18n.getMessage('confirmFeedDeletionText', feed.title);
 
         if (window.confirm(text)) {
             FeedList.db.deleteFeed(feed);
@@ -1232,7 +1232,7 @@ export let Commands = {
     showFeedProperties: function cmd_showFeedProperties(aFeed) {
         let feed = aFeed ? aFeed : FeedList.selectedFeed;
 
-        browser.windows.create({
+        chrome.windows.create({
             url: `/ui/options/feed-properties.xhtml?feedID=${feed.feedID}`,
             type: 'popup',
             width: 400,
@@ -1241,15 +1241,15 @@ export let Commands = {
     },
 
     displayShortcuts: async function cmd_displayShortcuts() {
-        let windows = await browser.windows.getAll({windowTypes: ['popup']});
+        let windows = await chrome.windows.getAll({windowTypes: ['popup']});
         // Compat: fixed in Firefox 58
         // @ts-ignore Types do not know about the `title` field
         windows = windows.filter(w => w.type === 'popup' && w.title.includes("Brief"));
         if(windows.length > 0) {
-            browser.windows.update(windows[0].id, {focused: true});
+            chrome.windows.update(windows[0].id, {focused: true});
         } else {
-            browser.windows.create({
-                url: '/ui/keyboard-shortcuts.xhtml',
+            chrome.windows.create({
+                url: '/ui/keyboard-shortcuts.html',
                 type: 'popup',
                 width: 500,
                 height: Math.min(window.screen.availHeight, 650),
@@ -1258,7 +1258,7 @@ export let Commands = {
     },
 
     async applyStyle() {
-        let {custom_css: style} = await browser.storage.local.get({'custom_css': ''});
+        let {custom_css: style} = await chrome.storage.local.get({'custom_css': ''});
         let blob = new Blob([style], {type: 'text/css'});
         let url = URL.createObjectURL(blob);
         (/** @type HTMLLinkElement */ (document.getElementById('custom-css'))).href = url;
