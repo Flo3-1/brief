@@ -5,7 +5,7 @@ import {SNIFF_WINDOW, sniffedToBeFeed} from "./xml-sniffer.js";
 export async function init() {
     console.debug("Initializing the feed request monitor");
     await initRedirectCache();
-    browser.webRequest.onHeadersReceived.addListener(
+    chrome.webRequest.onHeadersReceived.addListener(
         checkHeaders,
         {types: ["main_frame"], urls: ["http://*/*", "https://*/*"]},
         ["responseHeaders", "blocking"],
@@ -20,7 +20,7 @@ let CANNOT_FILTER_AFTER_REDIRECT = false; // will be initialized in `init`
 let SKIP_AFTER_REDIRECT = new Set();
 let SKIP_AFTER_REDIRECT_SEEN = new Set();
 async function initRedirectCache() {
-    let browserInfo = await browser.runtime.getBrowserInfo();
+    let browserInfo = await chrome.runtime.getBrowserInfo();
     let baseVersion = Number(browserInfo.version.split('.')[0]);
     if(baseVersion >= 72 && baseVersion < 77) { // ...and some 77 nightlies...
         CANNOT_FILTER_AFTER_REDIRECT = true;
@@ -70,7 +70,7 @@ const MAYBE_FEED_TYPES = [
 
 // Headers are formally optional, but always present because of 'responseHeaders' requirement
 async function checkHeaders({requestId, tabId, url, responseHeaders=null}) {
-    if(tabId === browser.tabs.TAB_ID_NONE) {
+    if(tabId === chrome.tabs.TAB_ID_NONE) {
         return; // This is not a real tab, so not redirecting anything
     }
     if(responseHeaders.filter(h => h.name.toLowerCase() == 'Location'.toLowerCase()).length > 0) {
@@ -92,7 +92,7 @@ async function checkHeaders({requestId, tabId, url, responseHeaders=null}) {
     let {mime, encoding} = parseContentType(contentType);
     if(KNOWN_FEED_TYPES.includes(mime)) {
         let previewUrl = "/ui/brief.xhtml?preview=" + encodeURIComponent(url);
-        browser.tabs.update(tabId, {url: previewUrl}); // No loadReplace: still on old page
+        chrome.tabs.update(tabId, {url: previewUrl}); // No loadReplace: still on old page
         return {cancel: true};
     }
     if(MAYBE_FEED_TYPES.includes(mime) || mime.includes('+xml')) {
@@ -102,7 +102,7 @@ async function checkHeaders({requestId, tabId, url, responseHeaders=null}) {
         if(!Prefs.get("monitor.sniffer")) {
             return;
         }
-        let filter = browser.webRequest.filterResponseData(requestId);
+        let filter = chrome.webRequest.filterResponseData(requestId);
         let chunks = [];
 
         filter.ondata = ({data}) => {
@@ -143,7 +143,7 @@ function checkContent(buffers, {encoding, url, tabId}) {
     if(sniffedToBeFeed(text)) {
         console.log('feed detected, redirecting to preview page for', url);
         let previewUrl = "/ui/brief.xhtml?preview=" + encodeURIComponent(url);
-        browser.tabs.update(tabId, {url: previewUrl, loadReplace: true});
+        chrome.tabs.update(tabId, {url: previewUrl, loadReplace: true});
     }
 }
 
