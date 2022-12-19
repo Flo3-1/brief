@@ -12,7 +12,7 @@ export async function importOPML(file) {
     try {
         results = parse(reader.result);
     } catch(e) {
-        window.alert(browser.i18n.getMessage('invalidFileAlertText'));
+        window.alert(chrome.i18n.getMessage('invalidFileAlertText'));
         return;
     }
 
@@ -107,7 +107,7 @@ export async function exportFeeds() {
     let blob = new Blob([data], {type: 'text/xml'});
     let url = URL.createObjectURL(blob);
 
-    await browser.downloads.download({url, filename: 'feedlist.opml', saveAs: true});
+    await chrome.downloads.download({url, filename: 'feedlist.opml', saveAs: true});
 }
 
 function cleanXMLText(str) {
