@@ -45,8 +45,8 @@ export let FeedUpdater = {
             'update-stop': () => this.stopUpdating(),
             'update-query-status': () => this._broadcastStatus(),
         });
-        browser.notifications.onClicked.addListener(() => {
-            browser.tabs.create({url: '/ui/brief.xhtml'});
+        chrome.notifications.onClicked.addListener(() => {
+            chrome.tabs.create({url: '/ui/brief.xhtml'});
         });
     },
 
@@ -211,15 +211,15 @@ export let FeedUpdater = {
         }
 
 
-        let alertTitle = browser.i18n.getMessage('updateAlertTitle');
+        let alertTitle = chrome.i18n.getMessage('updateAlertTitle');
 
-        let newForms = browser.i18n.getMessage('updateAlertText_new_pluralForms');
+        let newForms = chrome.i18n.getMessage('updateAlertText_new_pluralForms');
         let newString = getPluralForm(entryCount, newForms);
 
-        let itemForms = browser.i18n.getMessage('updateAlertText_item_pluralForms');
+        let itemForms = chrome.i18n.getMessage('updateAlertText_item_pluralForms');
         let itemString = getPluralForm(entryCount, itemForms);
 
-        let feedForms = browser.i18n.getMessage('updateAlertText_feed_pluralForms');
+        let feedForms = chrome.i18n.getMessage('updateAlertText_feed_pluralForms');
         let feedString = getPluralForm(feedCount, feedForms);
 
         let alertText;
@@ -228,18 +228,18 @@ export let FeedUpdater = {
             let feedTitle = this.db.getFeed(firstFeed).title;
             feedTitle = feedTitle.length < 35 ? feedTitle : feedTitle.substr(0, 35) + '\u2026';
 
-            alertText = browser.i18n.getMessage(
+            alertText = chrome.i18n.getMessage(
                 'updateAlertText_singleFeedMessage', [feedTitle, newString, itemString]);
             alertText = alertText.replace('#numItems', entryCount);
         }
         else {
-            alertText = browser.i18n.getMessage(
+            alertText = chrome.i18n.getMessage(
                 'updateAlertText_multpleFeedsMessage', [newString, itemString, feedString]);
             alertText = alertText
                 .replace('#numItems', entryCount)
                 .replace('#numFeeds', feedCount.toString());
         }
-        browser.notifications.create({
+        chrome.notifications.create({
             type: 'basic',
             title: alertTitle,
             message: alertText,
