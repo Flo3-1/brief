@@ -119,7 +119,7 @@ export let Database = {
                 'entries-expire': ({feeds}) => this.expireEntries(feeds),
             });
 
-            browser.bookmarks.onCreated.addListener((id, {url}) => {
+            chrome.bookmarks.onCreated.addListener((id, {url}) => {
                 if(url === undefined) {
                     return;
                 }
@@ -128,7 +128,7 @@ export let Database = {
                     changes: {starred: 1},
                 });
             });
-            browser.bookmarks.onRemoved.addListener((id, {node: {url}}) => {
+            chrome.bookmarks.onRemoved.addListener((id, {node: {url}}) => {
                 if(url === undefined) {
                     return;
                 }
@@ -327,10 +327,10 @@ export let Database = {
 
         if(feeds.length === 0) {
             console.log(`Brief: the database looks empty, testing backups`);
-            ({feeds} = await browser.storage.local.get({feeds: []}));
+            ({feeds} = await chrome.storage.local.get({feeds: []}));
             console.log(`Brief: ${feeds.length} feeds found in local storage`);
             if(feeds.length === 0) {
-                ({feeds} = await browser.storage.sync.get({feeds: []}));
+                ({feeds} = await chrome.storage.sync.get({feeds: []}));
                 console.log(`Brief: ${feeds.length} feeds found in sync storage`);
             }
             this._feeds = feeds;
@@ -869,8 +869,8 @@ export let Database = {
             minimizedFeeds.push(minimized);
         }
         feeds = minimizedFeeds;
-        let store_local = browser.storage.local.set({feeds});
-        let store_sync = browser.storage.sync.set({feeds}).catch(error => {
+        let store_local = chrome.storage.local.set({feeds});
+        let store_sync = chrome.storage.sync.set({feeds}).catch(error => {
             console.warn("Brief failed to save feedlist to storage.sync:", error);
         });
         await Promise.all([store_local, store_sync]);
@@ -1194,13 +1194,13 @@ Query.prototype = {
         let entries = await this.getEntries();
         let actions = [];
         for(let entry of entries) {
-            let promise = browser.bookmarks.search({url: entry.entryURL}).then(async bookmarks => {
+            let promise = chrome.bookmarks.search({url: entry.entryURL}).then(async bookmarks => {
                 if(state && bookmarks.length == 0) {
                     let revision = entry.revisions[entry.revisions.length - 1];
-                    await browser.bookmarks.create({url: entry.entryURL, title: revision.title}).then(() => {});
+                    await chrome.bookmarks.create({url: entry.entryURL, title: revision.title}).then(() => {});
                 } else if(!state && bookmarks.length > 0) {
                     await Promise.all(bookmarks.map(b =>
-                        browser.bookmarks.remove(b.id)));
+                        chrome.bookmarks.remove(b.id)));
                 } else {
                     // Database does not match bookmarks - correct database directly
                     await Database.query(entry.id)._update({
