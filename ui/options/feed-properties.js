@@ -99,10 +99,10 @@ async function init() {
     Enabler.init();
 
     // Workaround for mozilla bug 1408446 (Firefox before 62 / non-OOP) and size correctly
-    let {id, height, width} = await browser.windows.getCurrent();
+    let {id, height, width} = await chrome.windows.getCurrent();
     let html = document.documentElement;
     console.log(html.scrollHeight, html.offsetHeight);
-    await browser.windows.update(id, {
+    await chrome.windows.update(id, {
         height: height + html.scrollHeight - window.innerHeight,
         width: width + html.scrollWidth - window.innerWidth,
     });
@@ -123,7 +123,7 @@ function updateScale() {
 }
 
 function setFeed(feed) {
-    document.title = browser.i18n.getMessage('feedSettingsDialogTitle', feed.title);
+    document.title = chrome.i18n.getMessage('feedSettingsDialogTitle', feed.title);
 
     PrefBinder.refresh();
 
