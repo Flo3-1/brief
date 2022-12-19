@@ -24,7 +24,7 @@ export let Prefs = {
         if (typeof browser === "undefined") {
             var browser = chrome;
         }
-        browser.storage.onChanged.addListener((changes, area) => {
+        chrome.storage.onChanged.addListener((changes, area) => {
             let pref_changes = changes.prefs;
             if (area !== 'local' || pref_changes === undefined)
                 return;
@@ -34,7 +34,7 @@ export let Prefs = {
             'set-pref': ({ name, value, actionName }) => this.set(name, value, actionName),
         });
 
-        let { prefs } = await browser.storage.local.get({ prefs: {} });
+        let { prefs } = await chrome.storage.local.get({ prefs: {} });
         this._values = prefs;
         await this._migrateOffDefaults();
     },
@@ -66,7 +66,7 @@ export let Prefs = {
         if (typeof browser === "undefined") {
             var browser = chrome;
         }
-        await browser.storage.local.set({ prefs: this._values });
+        await chrome.storage.local.set({ prefs: this._values });
     },
 
     reset: async function (name) {
