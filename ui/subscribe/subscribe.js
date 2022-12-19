@@ -2,10 +2,12 @@ import {Comm} from "/modules/utils.js";
 
 
 async function onload() {
-    let {id: windowId} = await browser.windows.getCurrent();
+    let {id: windowId} = await chrome.windows.getCurrent();
 
     let feeds = await Comm.callMaster('subscribe-get-feeds', {windowId});
-    if(feeds.length === 0) {
+	
+    
+	if(feeds.length === 0) {
         console.log('Nothing to subscribe to');
         return;
     } else if(feeds.length === 1) {
@@ -25,6 +27,7 @@ async function onload() {
             document.body.appendChild(node);
         }
     }
+	
 }
 
 window.addEventListener('load', onload, false);
