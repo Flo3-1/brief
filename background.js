@@ -30,67 +30,67 @@ const Brief = {
         if (typeof browser === "undefined") {
             var browser = chrome;
         }
-        browser.runtime.onInstalled.addListener(async ({temporary}) => {
+        chrome.runtime.onInstalled.addListener(async ({temporary}) => {
             if(temporary) { // `web-ext run` or equivalent
                 Comm.verbose = true;
-                const TEST_INDEX = browser.runtime.getURL('/test/index.xhtml');
-                let tabs = await browser.tabs.query({url: TEST_INDEX});
-                let debugging = (await browser.tabs.query({}))
+                const TEST_INDEX = chrome.runtime.getURL('/test/index.xhtml');
+                let tabs = await chrome.tabs.query({url: TEST_INDEX});
+                let debugging = (await chrome.tabs.query({}))
                     .some(({url}) => url === 'about:debugging');
                 if(tabs.length === 0 && !debugging) {
-                    browser.tabs.create({url: TEST_INDEX});
+                    chrome.tabs.create({url: TEST_INDEX});
                 } else {
                     for(let {id} of tabs) {
-                        browser.tabs.reload(id);
+                        chrome.tabs.reload(id);
                     }
                 }
             }
         });
 
-        if (typeof browser.browserAction === "undefined") {
-            browser.browserAction = browser.action;
+        if (typeof chrome.browserAction === "undefined") {
+            chrome.browserAction = chrome.action;
 
         }
 
-        browser.browserAction.onClicked.addListener(
-            () => browser.tabs.create({url: '/ui/brief.xhtml'}));
-        browser.browserAction.setBadgeBackgroundColor({color: '#666666'});
+        chrome.browserAction.onClicked.addListener(
+            () => chrome.tabs.create({url: '/ui/brief.xhtml'}));
+        chrome.browserAction.setBadgeBackgroundColor({color: '#666666'});
 
         let menus;
         if (typeof chrome === "undefined") {
-            menus = browser.menus;
+            menus = chrome.menus;
         } else {
             menus = chrome.contextMenus;
         }
 
         menus.create({
             id: "brief-button-refresh",
-            title: browser.i18n.getMessage("briefCtxRefreshFeeds_label"),
+            title: chrome.i18n.getMessage("briefCtxRefreshFeeds_label"),
             contexts: ["browser_action"]
         });
         menus.create({
             id: "brief-button-mark-read",
-            title: browser.i18n.getMessage("briefCtxMarkFeedsAsRead_label"),
+            title: chrome.i18n.getMessage("briefCtxMarkFeedsAsRead_label"),
             contexts: ["browser_action"]
         });
         menus.create({
             id: "brief-button-show-unread",
             type: "checkbox",
-            title: browser.i18n.getMessage("briefCtxShowUnreadCounter_label"),
+            title: chrome.i18n.getMessage("briefCtxShowUnreadCounter_label"),
             contexts: ["browser_action"]
         });
         menus.create({
             id: "brief-button-options",
-            title: browser.i18n.getMessage("briefCtxShowOptions_label"),
+            title: chrome.i18n.getMessage("briefCtxShowOptions_label"),
             contexts: ["browser_action"]
         });
 
         //I have no idea what this does so it has to leave
         // TODO: find out whtat the purpose is
-        //browser.menus.onClicked.addListener(info => this.onContext(info));
+        //chrome.menus.onClicked.addListener(info => this.onContext(info));
 
         if (typeof chrome.runtime.getBrowserInfo !== "undefined") {
-            let browserInfo = await browser.runtime.getBrowserInfo();
+            let browserInfo = await chrome.runtime.getBrowserInfo();
             let baseVersion = browserInfo.version.split('.')[0];
             if (Number(baseVersion) < 64) { // Early Firefox 64 nightlies have previews too
                 this._firefoxPreviewWorkaround = true;
@@ -117,7 +117,7 @@ const Brief = {
         this._updateUI();
         // TODO: first run page
 
-        browser.tabs.onUpdated.addListener((id, change, tab) => {
+        chrome.tabs.onUpdated.addListener((id, change, tab) => {
             if(tab.active === false) {
                 return;
             }
@@ -129,8 +129,8 @@ const Brief = {
                 status: tab.status,
             });
         });
-        browser.tabs.onActivated.addListener((ids) => this.queryFeeds(ids));
-        let activeTabs = await browser.tabs.query({active: true});
+        chrome.tabs.onActivated.addListener((ids) => this.queryFeeds(ids));
+        let activeTabs = await chrome.tabs.query({active: true});
         for(let tab of activeTabs) {
             this.queryFeeds({
                 tabId: tab.id,
@@ -157,7 +157,7 @@ const Brief = {
                 Prefs.set('showUnreadCounter', checked);
                 break;
             case 'brief-button-options':
-                browser.runtime.openOptionsPage();
+                chrome.runtime.openOptionsPage();
                 break;
         }
     },
@@ -194,10 +194,10 @@ const Brief = {
             let url = decodeURIComponent(matchSubscribe.pop());
             Database.addFeeds({url});
             // @ts-ignore Types do not know that the tab ID is optional
-            browser.tabs.update({url: '/ui/brief.xhtml'});
+            chrome.tabs.update({url: '/ui/brief.xhtml'});
         }
         try {
-            replies = /** @type {{kind, url}[][]} */(await browser.tabs.executeScript(tabId, {
+            replies = /** @type {{kind, url}[][]} */(await chrome.scripting.executeScript(tabId, {
                 file: '/content_scripts/scan-for-feeds.js',
                 runAt: 'document_end',
             }));
@@ -205,7 +205,7 @@ const Brief = {
             if(ex.message === 'Missing host permission for the tab') {
                 // There are a few known cases: about:, restricted (AMO) and feed preview pages
                 if(url === undefined) {
-                    ({url, title, status} = await browser.tabs.get(tabId));
+                    ({url, title, status} = await chrome.tabs.get(tabId));
                 }
                 let {host, protocol} = new URL(url);
                 if(url === undefined || protocol === 'about:' || protocol === 'view-source:') {
@@ -228,8 +228,6 @@ const Brief = {
                 // Happens during tab restore / history navigation (transient states?)
             } else if(ex.message === 'Message manager disconnected') {
                 // Happens during redirect-to-feed (transient states?)
-            } else {
-                console.warn("Ignoring unknown error scanning tab for feeds", ex);
             }
         }
         // Default: fallback to "this is not a feed page"
@@ -237,22 +235,23 @@ const Brief = {
             replies = [[]];
         }
         let feeds = replies[0];
-        if(feeds.length > 0) {
+        /*if(feeds.length > 0) {
             // Redirecting from the Firefox preview mode looks just ugly, let's keep it the old way
             if(feeds[0].kind === 'self' && !this._firefoxPreviewWorkaround) {
                 let target = encodeURIComponent(feeds[0].url);
                 let previewUrl = "/ui/brief.xhtml?preview=" + target;
-                browser.tabs.update(tabId, {url: previewUrl, loadReplace: true});
+                chrome.tabs.update(tabId, {url: previewUrl, loadReplace: true});
             }
-            browser.pageAction.show(tabId);
+            chrome.pageAction.show(tabId);
             let path = null;
             if(feeds[0].kind === 'self') {
                 path = '/icons/brief.svg#pulsing';
             }
-            browser.pageAction.setIcon({path, tabId});
+            chrome.pageAction.setIcon({path, tabId});
         } else {
-            browser.pageAction.hide(tabId);
+            chrome.pageAction.hide(tabId);
         }
+		*/
         this._windowFeeds.set(windowId, feeds);
     },
 
@@ -262,7 +261,7 @@ const Brief = {
         }
         let menus;
         if (typeof chrome === "undefined") {
-            menus = browser.menus;
+            menus = chrome.menus;
         } else {
             menus = chrome.contextMenus;
         }
@@ -282,9 +281,9 @@ const Brief = {
                 if (text.length > 4)
                     text = '..' + text.substring(text.length - 3);
             }
-            browser.browserAction.setBadgeText({text});
+            chrome.browserAction.setBadgeText({text});
         } else {
-            browser.browserAction.setBadgeText({text: ""});
+            chrome.browserAction.setBadgeText({text: ""});
         }
         //TODO: return tooltip
         /*
@@ -379,7 +378,7 @@ const Brief = {
                 let tooltip = `${updated}\n\n${noUnreadText}${rows.join('\n')}`;
             },
          */
-        //browser.browserAction.setTitle({title: tooltip});
+        //chrome.browserAction.setTitle({title: tooltip});
     },
 };
 
