@@ -1,5 +1,5 @@
 *.xpi
 node_modules/
 package-lock.json
-*/minni-*.js
+minimized/*
 *.swp

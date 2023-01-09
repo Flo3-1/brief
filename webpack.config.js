@@ -1,28 +1,14 @@
 const path = require('path');
 
-/*module.exports = {
-  mode: 'none',
-  entry: './node_modules/dom-parser/index.js',
-  output: {
-    path: path.resolve(__dirname, 'modules'),
-    filename: 'DOMpars.js',
-  },
-};*/
 
 module.exports = {
   mode: 'none',
-  entry: './background.js',
-  output: {
-    path: path.resolve(__dirname, '.'),
-    filename: 'minni-background.js',
+  entry: {
+	  background:	'./background.js',
+	  brief:	'./ui/brief',
   },
-};
-
-module.exports = {
-  mode: 'none',
-  entry: './ui/brief.js',
   output: {
-    path: path.resolve(__dirname, 'ui'),
-    filename: 'minni-brief.js',
+    path: path.resolve(__dirname, './minimized/'),
+    filename: 'minni-[name].js',
   },
 };
