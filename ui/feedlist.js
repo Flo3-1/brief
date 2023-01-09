@@ -1262,6 +1262,6 @@ export let Commands = {
         let blob = new Blob([style], {type: 'text/css'});
         let url = URL.createObjectURL(blob);
         (/** @type HTMLLinkElement */ (document.getElementById('custom-css'))).href = url;
-        gCurrentView.document.getElementById('custom-css').href = url;
+        document.getElementById('custom-css').href = url;
     },
 };

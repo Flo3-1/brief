@@ -111,11 +111,11 @@ export function FeedView({
         },
     });
 
-    this.document.addEventListener('auxclick', this, true);
-    this.document.addEventListener('click', this, true);
-    this.document.addEventListener('scroll', this, true);
+    document.addEventListener('auxclick', this, true);
+    document.addEventListener('click', this, true);
+    document.addEventListener('scroll', this, true);
 
-    this.document.addEventListener('detach-feedview', this);
+    document.addEventListener('detach-feedview', this);
 
     // Fixed entry list if not using a query
     if (entries !== null) {
@@ -184,9 +184,9 @@ FeedView.prototype = {
 
     get document() { return this.contentDocument; },
 
-    get window() { return this.document.defaultView; },
+    get window() { return document.defaultView; },
 
-    get feedContent() { return this.document.getElementById('feed-content'); },
+    get feedContent() { return document.getElementById('feed-content'); },
 
 
     getEntryIndex: function (aEntry) { return this._loadedEntries.indexOf(aEntry); },
@@ -734,21 +734,21 @@ FeedView.prototype = {
         this._loadedEntries = [];
         this._entryViews = new Map();
 
-        this.document.body.classList.remove('headlines-view');
-        this.document.body.classList.remove('multiple-feeds');
+        document.body.classList.remove('headlines-view');
+        document.body.classList.remove('multiple-feeds');
 
         // Manually reset the scroll position, otherwise weird stuff happens.
         this.window.scrollTo({ top: 0 });
         this._prevPosition = 0;
 
         // Clear DOM content.
-        this.document.body.removeChild(this.feedContent);
+        document.body.removeChild(this.feedContent);
         let content = this.document.createElement('main');
         content.id = 'feed-content';
-        this.document.body.appendChild(content);
+        document.body.appendChild(content);
 
         // Prevent the message from briefly showing up before entries are loaded.
-        this.document.getElementById('message-box').style.display = 'none';
+        document.getElementById('message-box').style.display = 'none';
 
         getElement('full-view-checkbox').dataset.checked = (!this.headlinesMode).toString();
         getElement('headlines-checkbox').dataset.checked = this.headlinesMode.toString();
@@ -756,10 +756,10 @@ FeedView.prototype = {
         getElement('view-title-label').textContent = this.titleOverride || this.title;
 
         if (!this.query.feeds || this.query.feeds.length > 1)
-            this.document.body.classList.add('multiple-feeds');
+            document.body.classList.add('multiple-feeds');
 
         if (this.headlinesMode)
-            this.document.body.classList.add('headlines-view');
+            document.body.classList.add('headlines-view');
 
         // Temporarily remove the listener because reading window.innerHeight
         // can trigger a resize event (!?).
