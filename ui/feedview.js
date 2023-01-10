@@ -186,7 +186,9 @@ FeedView.prototype = {
 
     get window() { return document.defaultView; },
 
-    get feedContent() { return document.getElementById('feed-content'); },
+    get feedContent() { return document.getElementById("feed-view").contentDocument.getElementById('feed-content'); },
+
+    get iframeDocument() { return document.getElementById("feed-view").contentDocument; },
 
 
     getEntryIndex: function (aEntry) { return this._loadedEntries.indexOf(aEntry); },
@@ -741,14 +743,18 @@ FeedView.prototype = {
         this.window.scrollTo({ top: 0 });
         this._prevPosition = 0;
 
+	console.log(this.feedContent);
         // Clear DOM content.
-        document.body.removeChild(this.feedContent);
-        let content = this.document.createElement('main');
+       	this.iframeDocument.body.removeChild(this.feedContent);
+	//let ifd=this.iframeDocument;
+	//console.log(ifd.body);
+	//ifd.body.removeChild(ifd.getElementById('feed-content'));
+        let content = this.iframeDocument.createElement('main');
         content.id = 'feed-content';
-        document.body.appendChild(content);
+        this.iframeDocument.body.appendChild(content);
 
         // Prevent the message from briefly showing up before entries are loaded.
-        document.getElementById('message-box').style.display = 'none';
+        this.iframeDocument.getElementById('message-box').style.display = 'none';
 
         getElement('full-view-checkbox').dataset.checked = (!this.headlinesMode).toString();
         getElement('headlines-checkbox').dataset.checked = this.headlinesMode.toString();
@@ -927,7 +933,7 @@ FeedView.prototype = {
     },
 
     _setEmptyViewMessage: function FeedView__setEmptyViewMessage() {
-        let messageBox = this.document.getElementById('message-box');
+        let messageBox = this.iframeDocument.getElementById('message-box');
         if (this._loadedEntries.length) {
             messageBox.style.display = 'none';
             return;
@@ -956,8 +962,8 @@ FeedView.prototype = {
             mainMessage = chrome.i18n.getMessage('noEntries');
         }
 
-        this.document.getElementById('main-message').textContent = mainMessage || '';
-        this.document.getElementById('secondary-message').innerHTML = secondaryMessage || '';
+        this.iframeDocument.getElementById('main-message').textContent = mainMessage || '';
+        this.iframeDocument.getElementById('secondary-message').innerHTML = secondaryMessage || '';
 
         messageBox.style.display = '';
     },

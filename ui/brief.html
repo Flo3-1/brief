@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="/skin/feedlist.css"></link>
     <link id='custom-css' rel="stylesheet" type="text/css"></link>
 
-    <script type="module" src="/minimized/minni-brief.js"></script>
+    <script type="module" src="brief.js"></script>
 </head>
 <body class="sidebar loading">
     <div id="sidebar" class="shrinkable vbox">
@@ -170,7 +170,8 @@
             <iframe id="feed-view"
                     class="growable"
                     src="about:srcdoc"
-                    sandbox="allow-forms allow-popups allow-same-origin"></iframe>
+                    sandbox="allow-same-origin"></iframe>
+	    		<!--sandbox="allow-forms allow-popups allow-same-origin allow-top-navigation" -->
         </div>
     </div>
     <context-menu-set>

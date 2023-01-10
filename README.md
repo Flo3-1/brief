@@ -28,9 +28,9 @@ There's a [separate Gitter room](https://gitter.im/brief-rss/localization)
 for announcements about localization-related matters (new strings and other matters).
 ## Build Requirements
 
-To build this Project the dependecy dom-parser is requred wich should be installed via npm in the project root directory:
+To build this Project the dependecy jsdom is requred wich should be installed via npm in the project root directory:
 ```
-$ npm install dom-parser
+$ npm install jsdom
 ```
 
 The files need to be combined, so node packages can work:
