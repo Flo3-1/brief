@@ -735,9 +735,8 @@ FeedView.prototype = {
         this._allEntriesLoaded = false;
         this._loadedEntries = [];
         this._entryViews = new Map();
-
-        document.body.classList.remove('headlines-view');
-        document.body.classList.remove('multiple-feeds');
+        this.iframeDocument.body.classList.remove('headlines-view');
+        this.iframeDocument.body.classList.remove('multiple-feeds');
 
         // Manually reset the scroll position, otherwise weird stuff happens.
         this.window.scrollTo({ top: 0 });
@@ -762,10 +761,10 @@ FeedView.prototype = {
         getElement('view-title-label').textContent = this.titleOverride || this.title;
 
         if (!this.query.feeds || this.query.feeds.length > 1)
-            document.body.classList.add('multiple-feeds');
+            this.iframeDocument.body.classList.add('multiple-feeds');
 
         if (this.headlinesMode)
-            document.body.classList.add('headlines-view');
+            this.iframeDocument.body.classList.add('headlines-view');
 
         // Temporarily remove the listener because reading window.innerHeight
         // can trigger a resize event (!?).
