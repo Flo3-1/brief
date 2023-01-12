@@ -9,10 +9,6 @@
         "storage", "unlimitedStorage", "downloads", "tabs", "notifications",
         "webRequest", "declarativeNetRequest"],
 	"host_permissions": ["<all_urls>"],
-    "background": {
-        "service_worker": "background.js",
-		"type": "module"
-    },
     "action": {
         "default_title": "Brief",
 		"browser_style": true,

@@ -822,7 +822,7 @@ FeedView.prototype = {
      */
     enoughEntriesPreloaded: function FeedView__enoughEntriesPreloaded(aWindowHeights) {
         return this._loadedEntries.length > 0 &&
-            (this.document.body.scrollHeight - this.window.pageYOffset >
+            (this.iframeDocument.body.scrollHeight - this.window.pageYOffset >
                 this.window.innerHeight * (aWindowHeights + 1))
             && this.getEntryInScreenCenter() != this.lastLoadedEntry;
     },
@@ -917,8 +917,8 @@ FeedView.prototype = {
         if (nextEntryView && entryView.day > nextEntryView.day)
             nextElem = nextElem.previousSibling;
 
-        if (!this.document.getElementById('day' + entryView.day)) {
-            let dayHeader = this.document.createElement('H1');
+        if (!this.iframeDocument.getElementById('day' + entryView.day)) {
+            let dayHeader = this.iframeDocument.createElement('H1');
             dayHeader.id = 'day' + entryView.day;
             dayHeader.className = 'day-header';
             dayHeader.textContent = entryView.getDateString(true);
@@ -1025,7 +1025,7 @@ function EntryView(aFeedView, aEntryData) {
 
     this.headline = this.feedView.headlinesMode;
 
-    this.container = this.feedView.document.getElementById('article-template').cloneNode(true);
+    this.container = this.feedView.iframeDocument.getElementById('article-template').cloneNode(true);
     this.container.id = aEntryData.id;
     this.container.classList.add(this.headline ? 'headline' : 'full');
 

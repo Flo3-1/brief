@@ -1,7 +1,6 @@
 import {Comm, wait, xhrPromise} from "./utils.js";
 
 const DEFAULT_TIMEOUT = 25000; // Default fetch timeout
-
 export async function fetchFeed(feed, {allow_cached = false} = {}) {
 	let url = feed.feedURL || feed;
 	/*let request = new XMLHttpRequest();
@@ -22,17 +21,12 @@ export async function fetchFeed(feed, {allow_cached = false} = {}) {
 		return;
 	}
 */
-	console.log("AGADS aus feedFetch");
-	var DomParser = require("../node_modules/dom-parser/lib/DomParser");
-	//console.log(parsModule);
-	//var DomParser =parsModule;
-	var parser = new DomParser();
-	let doc= fetch(url)
-		.then(response => response.text())
-		.then(str => parser.parseFromString(str))
-		.then(data => console.log(data));
-	console.log(doc);
-	console.log("AGADS2 aus feedFetch");
+	//url='https://orf.at';
+	let text=await fetch(url);
+	let domparser= new DOMParser();
+	let doc=domparser.parseFromString(await text.text(), 'text/xml');
+	console.log(text);
+	console.log(DOMParser);
 
 	if(doc.documentElement.localName === 'parseerror') {
 		console.error("failed to parse as XML", url);
@@ -46,6 +40,7 @@ export async function fetchFeed(feed, {allow_cached = false} = {}) {
 	}
 
 	let result = parseNode(root, FEED_PROPERTIES);
+	console.log(result);
 	if(!result || !result.items || !(result.items.length > 0)) {
 		console.warn("failed to find any items in", url);
 	} else {
