@@ -57,14 +57,14 @@ TreeView.prototype = {
                 if(next.dataset && next.dataset.id && knownIds.has(next.dataset.id)) {
                     break; // Found the next known item
                 }
-                if(!IMPL_ITEMS.includes(next.nodeName)) {
+                if(!IMPL_ITEMS.includes(next.nodeName.toLowerCase())) {
                     if(next.nodeType !== Node.ELEMENT_NODE) {
                         // Just ignore them
                     } else {
                         next.classList.add('deleted');
                     }
                 }
-                if(next.nodeName === 'tree-folder-footer') {
+                if(next.nodeName.toLowerCase() === 'tree-folder-footer') {
                     break;
                 }
                 next = next.nextSibling;
@@ -130,8 +130,8 @@ TreeView.prototype = {
         const oldModel = this._elementModelCache.get(element);
         this._elementModelCache.set(element, {...oldModel, ...aModel});
 
-        const isFolder = (element.nodeName === "tree-folder");
-        console.assert(element.nodeName === 'tree-folder' || children === undefined,
+        const isFolder = (element.nodeName.toLowerCase() === "tree-folder");
+        console.assert(element.nodeName.toLowerCase() === 'tree-folder' || children === undefined,
             "item->folder conversion not supported");
         let row = isFolder ? element.querySelector('tree-folder-header') : element;
 
@@ -244,7 +244,7 @@ TreeView.prototype = {
         if(type === 'blur') {
             //TODO: fix layering violation
             let item = target.parentNode.parentNode;
-            if(target.parentNode.nodeName === 'tree-folder-footer') {
+            if(target.parentNode.nodeName.toLowerCase() === 'tree-folder-footer') {
                 FeedList._append({feedID: item.dataset.id, title: target.textContent});
             } else {
                 FeedList._rename({feedID: item.dataset.id, title: target.textContent});
@@ -254,7 +254,7 @@ TreeView.prototype = {
         if(event.type === 'click' && event.currentTarget.classList.contains('toggle-collapsed')) {
             // (un)collapse
             let element = event.currentTarget;
-            while(element.nodeName !== 'tree-folder') {
+            while(element.nodeName.toLowerCase() !== 'tree-folder') {
                 element = element.parentNode;
             }
             element.classList.toggle('collapsed');
@@ -266,7 +266,7 @@ TreeView.prototype = {
                 return;
             }
             let target = event.currentTarget;
-            if(target.nodeName === 'tree-folder-header')
+            if(target.nodeName.toLowerCase() === 'tree-folder-header')
                 target = target.parentNode;
             this.selectedItem = target;
         }
@@ -1000,7 +1000,7 @@ export let FeedListContextMenu = {
     },
 
     prepare() {
-        let folder = FeedList.selectedItem.nodeName === 'tree-folder';
+        let folder = FeedList.selectedItem.nodeName.toLowerCase() === 'tree-folder';
         this.menu.classList.toggle('folder', folder);
 
         if(!folder) {

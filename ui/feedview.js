@@ -744,7 +744,6 @@ FeedView.prototype = {
         this.window.scrollTo({ top: 0 });
         this._prevPosition = 0;
 
-	console.log(this.feedContent);
         // Clear DOM content.
        	this.iframeDocument.body.removeChild(this.feedContent);
 	//let ifd=this.iframeDocument;
