@@ -5,7 +5,8 @@ import {
 } from "/modules/utils.js";
 
 async function translateText(content, target) {
-
+   target.innerHTML= 'Translated '+content;
+    return target.innerHTML;
     //await testsleep(1000);
     //TODO: Do real translation
     let res = await fetch('https://script.google.com/macros/s/AKfycbzb4hfCy02QFWfRR7b7TJhGcF6SeIoWRSP9hOUvMdFASVsp9Cy86ysvJhp-PQCWO4fsaQ/exec?param=' + escape(content)).then(response => {
@@ -17,7 +18,6 @@ async function translateText(content, target) {
 
     });
 
-    console.log(res);
     target.innerHTML = res;
     return target.innerHTML;
 
@@ -114,6 +114,8 @@ export function FeedView({
     document.addEventListener('auxclick', this, true);
     document.addEventListener('click', this, true);
     document.addEventListener('scroll', this, true);
+
+    document.getElementById("feed-view").contentDocument.addEventListener('click', this, true);
 
     document.addEventListener('detach-feedview', this);
 
@@ -458,6 +460,7 @@ FeedView.prototype = {
                     return;
                 }
             // fallthrough
+	    // this cas is probably not in use but we kept it just to be sure....
             case 'auxclick':
                 {
                     // The tutorial link needs to be opened from a privileged context
@@ -478,7 +481,6 @@ FeedView.prototype = {
 
                         node = node.parentNode;
                     }
-
                     if (target)
                         this.getEntryView(parseInt(target.id)).onClick(aEvent);
                 }

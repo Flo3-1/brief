@@ -93,7 +93,7 @@ TreeView.prototype = {
         }
     },
     _initElement: function TreeView__initElement(element) {
-        let type = element.nodeName;
+        let type = element.nodeName.toLowerCase();
         const CHILDREN = ['tree-folder-header', 'tree-folder-footer'];
         for(let selector of CHILDREN) {
             for(let node of element.querySelectorAll(selector)) {
