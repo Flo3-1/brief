@@ -805,8 +805,9 @@ export let ContextMenuModule = {
 
     init() {
         this._observer = new MutationObserver((records) => this._observeMutations(records));
-        this._observer.observe(document, {subtree: true,
-            childList: true, attributes: true, attributeFilter: ['contextmenu', 'data-dropdown']});
+        this._observer.observe(document.querySelector('#feed-list'), {subtree: true,
+            childList: true, attributes: true, characterData: true });
+	    document.querySelector('#feed-list').addEventListener("DOMNodeInserted", (event) => this._observeMutations(event), false);
 
         this._initSubtrees([document.documentElement]);
 
@@ -868,6 +869,7 @@ export let ContextMenuModule = {
     },
 
     _observeMutations: function ContextMenu__observeMutations(records) {
+	    records=this._observer.takeRecords();
         let targets = new Set();
         for(let {target, addedNodes} of records) {
             let nodes = addedNodes || [target];
