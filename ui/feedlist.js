@@ -1235,7 +1235,7 @@ export let Commands = {
         let feed = aFeed ? aFeed : FeedList.selectedFeed;
 
         chrome.windows.create({
-            url: `/ui/options/feed-properties.xhtml?feedID=${feed.feedID}`,
+            url: `/ui/options/feed-properties.html?feedID=${feed.feedID}`,
             type: 'popup',
             width: 400,
             height: 300,
